@@ -45,10 +45,9 @@ app.post(
         return;
       }
 
-      const colJson = JSON.stringify(params.col).replace(/"/g, '\\"');
       const rScript = path.join(__dirname, "generate_heatmap.R");
 
-      const command = `Rscript ${rScript} "${filePath}" "${params.fileHasHeader}" "${params.firstColumnIsLabel}" "${params.columnSeparator}" "${params.decimalSeparator}" "${params.quoteChar}" "${colJson}" "${params.name}"`;
+      const command = `Rscript ${rScript} "${filePath}" "${params.fileHasHeader}" "${params.firstColumnIsLabel}" "${params.columnSeparator}" "${params.decimalSeparator}" "${params.quoteChar}" "${params.col}" "${params.name}"`;
 
       exec(command, (error, stdout, stderr) => {
         if (error) {

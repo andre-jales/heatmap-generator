@@ -2,7 +2,7 @@
 args <- commandArgs(trailingOnly = TRUE)
 
 # Atribui os parâmetros a variáveis
-arquivo <- args[1]
+file <- args[1]
 file_has_header <- as.logical(args[2])
 first_column_is_label <- as.logical(args[3])
 column_separator <- args[4]
@@ -16,41 +16,39 @@ suppressPackageStartupMessages(library(ComplexHeatmap))
 suppressPackageStartupMessages(library(circlize))
 suppressPackageStartupMessages(library(jsonlite))
 
-# Converte o JSON de colunas para um formato utilizável em R
-# col <- fromJSON(col_json)
-col_fun <- colorRamp2(c(-1, 0, 1), c("green", "yellow", "red"))
+# Verifica se a primeira coluna é um label
+row_names <- NULL
+
+if(first_column_is_label) {
+  row_names <- 1
+} else {
+  row_names <- 0
+}
 
 # Lê o arquivo com o delimitador passado
-x <- read.delim(arquivo, row.names = 1, check.names = FALSE)
+table <- read.table(file,
+                    row.names = row_names,
+                    header = file_has_header,
+                    sep = column_separator,
+                    dec = decimal_separator,
+                    quote = quote_char,
+                    check.names = FALSE)
 
-# Caso o arquivo tenha header, a primeira linha será tratada como nomes das colunas
-if (file_has_header) {
-  colnames(x) <- colnames(x)
-}
-
-# Caso a primeira coluna seja rótulo
-if (first_column_is_label) {
-  rownames(x) <- x[, 1]
-  x <- x[, -1]
-}
-
-x <- data.matrix(x)
+matrix <- data.matrix(table)
 
 # A criação da função de cores com base nos valores passados
-# Assumindo que col seja uma lista de objetos com a propriedade "color" e "value"
-#color_values <- sapply(col, function(x) x$value)
-#color_names <- sapply(col, function(x) x$color)
-
-# Definindo a função de cores para o heatmap
-#col_fun <- colorRamp2(color_values, color_names)
+color_object <- fromJSON(col_json)
+color_values <- sapply(color_object, function(x) x$value)
+color_names <- sapply(color_object, function(x) x$color)
+color_fun <- colorRamp2(color_values, color_names)
 
 # Cria o heatmap
-ht <- Heatmap(x, 
+ht <- Heatmap(x,
               name = name,
-              col = col_fun, 
-              column_title = "Heatmap", 
-              row_title = "Rows",
-              show_row_names = TRUE, 
+              col = col_fun,
+              column_title = "",
+              row_title = "",
+              show_row_names = TRUE,
               show_column_names = TRUE)
 
 # Salva a imagem do heatmap
