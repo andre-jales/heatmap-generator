@@ -8,7 +8,7 @@ first_column_is_label <- as.logical(args[3])
 column_separator <- args[4]
 decimal_separator <- args[5]
 quote_char <- args[6]
-col_json <- args[7]
+color_json <- gsub("^'|'$", "", args[7])
 name <- args[8]
 
 # Carrega o pacote ComplexHeatmap e outros necessários
@@ -19,7 +19,7 @@ suppressPackageStartupMessages(library(jsonlite))
 # Verifica se a primeira coluna é um label
 row_names <- NULL
 
-if(first_column_is_label) {
+if (first_column_is_label) {
   row_names <- 1
 } else {
   row_names <- 0
@@ -37,15 +37,15 @@ table <- read.table(file,
 matrix <- data.matrix(table)
 
 # A criação da função de cores com base nos valores passados
-color_object <- fromJSON(col_json)
+color_object <- fromJSON(col_json, simplifyVector = FALSE)
 color_values <- sapply(color_object, function(x) x$value)
 color_names <- sapply(color_object, function(x) x$color)
 color_fun <- colorRamp2(color_values, color_names)
 
 # Cria o heatmap
-ht <- Heatmap(x,
+ht <- Heatmap(matrix,
               name = name,
-              col = col_fun,
+              col = color_fun,
               column_title = "",
               row_title = "",
               show_row_names = TRUE,
