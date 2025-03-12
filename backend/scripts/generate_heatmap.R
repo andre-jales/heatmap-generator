@@ -18,7 +18,6 @@ suppressPackageStartupMessages(library(jsonlite))
 
 # Verifica se a primeira coluna é um label
 row_names <- NULL
-
 if (first_column_is_label) {
   row_names <- 1
 } else {
@@ -37,7 +36,7 @@ table <- read.table(file,
 matrix <- data.matrix(table)
 
 # A criação da função de cores com base nos valores passados
-color_object <- fromJSON(col_json, simplifyVector = FALSE)
+color_object <- fromJSON(color_json, simplifyVector = FALSE)
 color_values <- sapply(color_object, function(x) x$value)
 color_names <- sapply(color_object, function(x) x$color)
 color_fun <- colorRamp2(color_values, color_names)
@@ -52,7 +51,13 @@ ht <- Heatmap(matrix,
               show_column_names = TRUE)
 
 # Salva a imagem do heatmap
-output_path <- file.path(getwd(), "heatmap.png")
+output_dir <- file.path(getwd(), "public")
+if (!dir.exists(output_dir)) {
+  dir.create(output_dir)
+}
+
+output_path <- file.path(output_dir, "heatmap.png")
+cat("Salvando imagem em:", output_path, "\n")
 png(output_path, width = 800, height = 800)
 draw(ht)
 dev.off()

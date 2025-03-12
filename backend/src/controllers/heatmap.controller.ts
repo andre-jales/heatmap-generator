@@ -18,10 +18,8 @@ export const generateHeatmapController = async (
     res.sendFile(imagePath);
   } catch (err) {
     console.error("Unexpected error:", err);
-    res
-      .status(500)
-      .json({
-        error: err instanceof Error ? err.message : "Internal server error.",
-      });
+    res.status(500).json({
+      error: err instanceof Error ? err.message : "Internal server error.",
+    });
   }
 };
